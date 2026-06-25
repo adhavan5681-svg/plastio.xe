@@ -1,0 +1,41 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Studio {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  clients      Client[]
+}
+
+model Client {
+  id         String       @id @default(uuid())
+  studioId   String
+  studio     Studio       @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  name       String
+  eventDate  DateTime
+  phone      String
+  uniqueLink String   @unique
+  pin        String   // 4-digit gallery passcode
+  status     String   @default("PENDING") // PENDING, PUBLISHED, SUBMITTED
+  createdAt  DateTime     @default(now())
+  photos     Photo[]
+}
+
+model Photo {
+  id         String   @id @default(uuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  filename   String
+  filepath   String
+  isSelected Boolean  @default(false)
+  uploadedAt DateTime @default(now())
+}
