@@ -36,13 +36,18 @@ This guide will help you deploy your Wedding Photo Selector app to AWS Amplify.
 
 ## Step 3: Configure Environment Variables
 
-In AWS Amplify Console, go to **App Settings** → **Environment Variables** and add:
+**⚠️ CRITICAL: Environment variables must be set in the Amplify Console UI, NOT in amplify.yml.**
+
+The `amplify.yml` build file does NOT support `env:` blocks inside `build:` commands — they will be silently ignored,
+causing your deployed app to crash at login. Always set environment variables via the Amplify Console.
+
+In AWS Amplify Console, go to **App settings** → **Environment variables** → **Manage variables** and add:
 
 ### Required Variables:
 
 ```env
-# Database
-DATABASE_URL=postgresql://postgres:[YOUR_PASSWORD]@[YOUR_HOST]:5432/postgres
+# Database (URL-encode special chars: @ → %40, # → %23, $ → %24)
+DATABASE_URL=postgresql://postgres:%40Adhav026an@db.example.com:5432/postgres
 
 # NextAuth
 NEXTAUTH_SECRET=[GENERATE_WITH: openssl rand -base64 32]
@@ -52,6 +57,19 @@ NEXTAUTH_URL=https://[YOUR_APP_ID].amplifyapp.com
 SUPABASE_URL=https://[YOUR_PROJECT_ID].supabase.co
 SUPABASE_ANON_KEY=[YOUR_SUPABASE_ANON_KEY]
 ```
+
+**🚨 Common Pitfall: Password special characters in DATABASE_URL**
+
+If your database password contains `@`, `#`, `$`, `%`, or `:`, you **must** URL-encode them:
+| Character | Encoded |
+|-----------|---------|
+| `@`       | `%40`   |
+| `#`       | `%23`   |
+| `$`       | `%24`   |
+| `%`       | `%25`   |
+| `:`       | `%3A`   |
+
+**Without this encoding, Prisma will fail to authenticate and login will return "No studio found" or a generic server error.**
 
 ### How to Generate NEXTAUTH_SECRET:
 

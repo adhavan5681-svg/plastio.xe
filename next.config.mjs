@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable standalone output for better Amplify compatibility
-  output: 'standalone',
-  
   // Image optimization configuration
   images: {
     remotePatterns: [
@@ -13,11 +10,15 @@ const nextConfig = {
     ],
   },
   
-  // Increase body size limit for file uploads
-  bodySizeLimit: 10 * 1024 * 1024, // 10MB
-  
   // Disable x-powered-by header for security
   poweredByHeader: false,
+  
+  // Increase API body size limit for file uploads
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
 };
 
 export default nextConfig;
